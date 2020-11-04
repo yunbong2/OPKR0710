@@ -177,7 +177,7 @@ static void update_track_data(UIState *s, bool is_mpc, track_vertices_data *pvd)
   const float *mpc_x_coords = &scene->mpc_x[0];
   const float *mpc_y_coords = &scene->mpc_y[0];
 
-  float off = is_mpc?0.3:0.5;
+  float off = is_mpc?0.2:1.0;
   float lead_d = scene->lead_data[0].getDRel()*2.;
   float path_height = is_mpc?(lead_d>5.)?fmin(lead_d, 25.)-fmin(lead_d*0.35, 10.):20.
                             :(lead_d>0.)?fmin(lead_d, 50.)-fmin(lead_d*0.35, 10.):49.;
@@ -392,6 +392,44 @@ static void ui_draw_vision_lanes(UIState *s) {
   {
     colorRight  = nvgRGBAf(1.0, 0.5, 0.5, right_lane );
   }
+
+  // lane color hoya
+  int left_red_lvl = 0;
+  int right_red_lvl = 0;
+  int left_green_lvl = 0;
+  int right_green_lvl = 0;
+  int left_blue_lvl = 0;
+  int right_blue_lvl = 0;
+
+  if ( scene->model.getLeftLane().getProb() > 0.65 ){
+    left_blue_lvl = int(255 - (1 - scene->model.getLeftLane().getProb()) * 2.857 * 255);
+    left_green_lvl = int(255 - (scene->model.getLeftLane().getProb() - 0.65) * 2.857 * 255);
+  }
+  else if ( scene->model.getLeftLane().getProb() > 0.4 ){
+    left_red_lvl = int(255 - (scene->model.getLeftLane().getProb() - 0.4) * 2.5 * 255);
+    left_green_lvl = 255 ;
+  }
+  else {
+    left_red_lvl = 255 ;
+    left_green_lvl = int(255 - (0.4 - scene->model.getLeftLane().getProb()) * 2.5 * 255);
+  }
+
+  if ( scene->model.getRightLane().getProb() > 0.65 ){
+    right_blue_lvl = int(255 - (1 - scene->model.getRightLane().getProb()) * 2.857 * 255);
+    right_green_lvl = int(255 - (scene->model.getRightLane().getProb() - 0.65) * 2.857 * 255);
+  }
+  else if ( scene->model.getRightLane().getProb() > 0.4 ){
+    right_red_lvl = int(255 - (scene->model.getRightLane().getProb() - 0.4) * 2.5 * 255);
+    right_green_lvl = 255 ;
+  }
+  else {
+    right_red_lvl = 255 ;
+    right_green_lvl = int(255 - (0.4 - scene->model.getRightLane().getProb()) * 2.5 * 255);
+  }
+
+  colorLeft = nvgRGBA (left_red_lvl, left_green_lvl, left_blue_lvl, 255);
+  colorRight = nvgRGBA (right_red_lvl, right_green_lvl, right_blue_lvl, 255);
+
   // Draw left lane edge
   ui_draw_lane(s, pvd, colorLeft);
 
