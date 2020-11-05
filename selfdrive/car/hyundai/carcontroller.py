@@ -129,7 +129,7 @@ class CarController():
     self.longcontrol = CP.openpilotLongitudinalControl
     self.scc_live = not CP.radarOffCan
 
-    self.steerMax = 255
+    self.steerMax = 280
     self.steerMax_timer = 0
 
     if CP.lateralTuning.which() == 'pid':
@@ -179,8 +179,8 @@ class CarController():
       if self.steerMax_timer > 5:
         self.steerMax -= 10
         self.steerMax_timer = 0
-        if self.steerMax < 255:
-          self.steerMax = 255
+        if self.steerMax < 280:
+          self.steerMax = 280
 
     # Steering Torque
     if self.driver_steering_torque_above_timer:
@@ -207,12 +207,12 @@ class CarController():
     spas_active = CS.spas_enabled and enabled and (self.spas_always or CS.out.vEgo < 7.0) # 25km/h
 
     # disable if steer angle reach 90 deg, otherwise mdps fault in some models
-    if self.opkr_maxanglelimit >= 90:
+    if self.opkr_maxanglelimit >= 180:
       lkas_active = enabled and abs(CS.out.steeringAngle) < self.opkr_maxanglelimit and not spas_active
     else:
       lkas_active = enabled and not spas_active
 
-    if (( CS.out.leftBlinker and not CS.out.rightBlinker) or ( CS.out.rightBlinker and not CS.out.leftBlinker)) and CS.out.vEgo < LANE_CHANGE_SPEED_MIN:
+    if (( CS.out.leftBlinker and not CS.out.rightBlinker) or ( CS.out.rightBlinker and not CS.out.leftBlinker)) and CS.out.vEgo = 30 * CV.KPH_TO_MS:#< LANE_CHANGE_SPEED_MIN:
       self.lanechange_manual_timer = 10
     if CS.out.leftBlinker and CS.out.rightBlinker:
       self.emergency_manual_timer = 10
